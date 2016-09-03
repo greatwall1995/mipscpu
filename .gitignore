@@ -1,0 +1,5 @@
+mipscpu/
+*.data
+*.mti
+*.mpf
+*.wlf
