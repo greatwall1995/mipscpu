@@ -9,7 +9,7 @@ module sopc(
 	wire[`InstBus] inst;
 	wire rom_ce;
 	
-	openmips openmips0(
+	mips mips0(
 		.clk(clk),
 		.rst(rst),
 		.rom_addr_o(inst_addr),
