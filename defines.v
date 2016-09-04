@@ -1,6 +1,8 @@
 //*******************         全局的宏定义        ***************************  
 `define RstEnable			1'b1               //复位信号有效  
 `define RstDisable			1'b0               //复位信号无效  
+`define BblEnable			1'b1               //复位信号有效  
+`define BblDisable			1'b0               //复位信号无效  
 `define ZeroWord			32'h00000000       //32位的数值0  
 `define WriteEnable			1'b1               //使能写  
 `define WriteDisable		1'b0               //禁止写  
@@ -21,6 +23,8 @@
 `define EXE_ANDI			6'b001100
 `define EXE_ORI				6'b001101          //指令ori的指令码  
 `define EXE_XORI			6'b001110
+
+`define CMD_NOP				32'h00000000
   
   
 //AluOp  

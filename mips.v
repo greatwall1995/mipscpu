@@ -8,7 +8,9 @@ module mips(
     input wire[`RegBus]        rom_data_i,  
     output wire[`RegBus]       rom_addr_o,  
     output wire                rom_ce_o  
-);  
+);
+	
+	wire bbl;
   
        // 连接IF/ID模块与译码阶段ID模块的变量  
     wire[`InstAddrBus] pc;  
@@ -63,6 +65,7 @@ module mips(
     pc_reg pc_reg0(  
 		.clk(clk),
 		.rst(rst),
+		.bbl(bbl),
 		.pc(pc),
 		.ce(rom_ce_o)  
     );  
@@ -73,6 +76,7 @@ module mips(
     if_id if_id0(
         .clk(clk),
 		.rst(rst),
+		.bbl(bbl),
 		.if_pc(pc),
         .if_inst(rom_data_i),
 		.id_pc(id_pc_i),
@@ -93,7 +97,8 @@ module mips(
         // 送到ID/EX模块的信息  
         .aluop_o(id_aluop_o),   .alusel_o(id_alusel_o),  
         .reg1_o(id_reg1_o),     .reg2_o(id_reg2_o),  
-        .wd_o(id_wd_o),     .wreg_o(id_wreg_o)  
+        .wd_o(id_wd_o),     .wreg_o(id_wreg_o),
+		.bbl(bbl)
     );  
   
        // 通用寄存器Regfile模块例化  

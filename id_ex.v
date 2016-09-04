@@ -2,8 +2,8 @@
 
 module id_ex(  
   
-    input   wire               clk,  
-    input  wire            rst,  
+    input wire clk,  
+    input wire rst,  
   
       
     // 从译码阶段传递过来的信息  

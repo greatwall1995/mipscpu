@@ -21,7 +21,9 @@ module id(
 	output reg[`RegBus]           reg1_o,  
 	output reg[`RegBus]           reg2_o,  
 	output reg[`RegAddrBus]       wd_o,  
-	output reg                    wreg_o  
+	output reg                    wreg_o,
+
+	output reg bbl
 );  
     
 	// 取得指令的指令码，功能码  
@@ -32,10 +34,17 @@ module id(
 	wire[4:0] op4 = inst_i[20:16];  
 	
 	// 保存指令执行需要的立即数  
-	reg[`RegBus]  imm;   
+	reg[`RegBus] imm;
+	reg[`RegAddrBus] reg1;
+	reg[`RegAddrBus] reg2;
 	
 	// 指示指令是否有效  
 	reg instvalid;  			// ?????????????????????
+	
+	initial begin
+		reg1 <= `RegNumLog2'h0;
+		reg2 <= `RegNumLog2'h0;
+	end
 	
 /**************************************************************** 
 ***********             第一段：对指令进行译码             ********* 
@@ -63,7 +72,8 @@ module id(
 			reg2_read_o <= 1'b0;  
 			reg1_addr_o <= inst_i[25:21];  // 默认通过Regfile读端口1读取的寄存器地址  
 			reg2_addr_o <= inst_i[20:16];  // 默认通过Regfile读端口2读取的寄存器地址  
-			imm <= `ZeroWord;      
+			imm <= `ZeroWord;
+			bbl <= `BblDisable;
 		
 			case (op)
 				`EXE_ANDI: begin
@@ -98,9 +108,32 @@ module id(
 				end
 				default: begin  
 				end  
-			endcase          //case op  
+			endcase          //case op 
 		end       //if  
 	end         //always  
+	
+	always @ (*) begin
+		bbl = `BblDisable;
+		if (reg1_read_o == 1'b1) begin
+			if (reg1 != `RegNumLog2'h0 && reg1_addr_o == reg1) begin
+				bbl = `BblEnable;
+			end else if (reg2 != `RegNumLog2'h0 && reg1_addr_o == reg2) begin
+				bbl = `BblEnable;
+			end
+		end else if (reg2_read_o == 1'b1) begin
+			if (reg1 != `RegNumLog2'h0 && reg2_addr_o == reg1) begin
+				bbl = `BblEnable;
+			end else if (reg2 != `RegNumLog2'h0 && reg2_addr_o == reg2) begin
+				bbl = `BblEnable;
+			end
+		end
+		reg2 = reg1;
+		if (bbl == `BblDisable) begin
+			reg1 = wd_o;
+		end else begin
+			reg1 = `NOPRegAddr;
+		end
+	end
 
 /**************************************************************** 
 ***********         第二段：确定进行运算的源操作数1        ********* 
@@ -118,9 +151,9 @@ module id(
 		end  
 	end  
 	
-	/**************************************************************** 
-	***********         第三段：确定进行运算的源操作数2        ********* 
-	*****************************************************************/  
+/**************************************************************** 
+***********         第三段：确定进行运算的源操作数2        ********* 
+*****************************************************************/  
 	
 	always @ (*) begin  
 		if(rst == `RstEnable) begin  
