@@ -157,21 +157,23 @@ module mips(
         .wdata_i(mem_wdata_i),  
         
         // 送到MEM/WB模块的信息  
-        .wd_o(mem_wd_o),        .wreg_o(mem_wreg_o),  
-        .wdata_o(mem_wdata_o)  
+        //.wd_o(mem_wd_o),        .wreg_o(mem_wreg_o),  
+        //.wdata_o(mem_wdata_o)  
+        .wd_o(wb_wd_i),        .wreg_o(wb_wreg_i),  
+        .wdata_o(wb_wdata_i)  
     );  
   
        // MEM/WB模块例化  
-    mem_wb mem_wb0(  
-        .clk(clk),            .rst(rst),  
-  
-        // 来自访存阶段MEM模块的信息     
-        .mem_wd(mem_wd_o),      .mem_wreg(mem_wreg_o),  
-        .mem_wdata(mem_wdata_o),  
-      
-        // 送到回写阶段的信息  
-        .wb_wd(wb_wd_i),        .wb_wreg(wb_wreg_i),  
-        .wb_wdata(wb_wdata_i)  
-    );  
+//    mem_wb mem_wb0(  
+//        .clk(clk),            .rst(rst),  
+//  
+//        // 来自访存阶段MEM模块的信息     
+//        .mem_wd(mem_wd_o),      .mem_wreg(mem_wreg_o),  
+//        .mem_wdata(mem_wdata_o),  
+//      
+//        // 送到回写阶段的信息  
+//        .wb_wd(wb_wd_i),        .wb_wreg(wb_wreg_i),  
+//        .wb_wdata(wb_wdata_i)  
+//    );  
   
 endmodule  
