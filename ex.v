@@ -18,28 +18,34 @@ module ex(
     output reg[`RegBus]         wdata_o  
       
 );  
-  
-       // 保存逻辑运算的结果  
-    reg[`RegBus] logicout;  
+
+	// 保存逻辑运算的结果  
+	reg[`RegBus] logicout;  
   
 /****************************************************************** 
 **  第一段：依据aluop_i指示的运算子类型进行运算，此处只有逻辑“或”运算 ** 
 *******************************************************************/  
-  
-    always @ (*) begin  
-      if(rst == `RstEnable) begin  
-        logicout <= `ZeroWord;  
-      end else begin  
-        case (aluop_i)  
-        `EXE_OR_OP: begin  
-           logicout <= reg1_i | reg2_i;  
-        end  
-        default:    begin  
-           logicout <= `ZeroWord;  
-        end  
-        endcase  
-      end    //if  
-    end      //always  
+
+	always @ (*) begin  
+		if(rst == `RstEnable) begin  
+			logicout <= `ZeroWord;  
+		end else begin  
+			case (aluop_i)
+				`EXE_AND_OP: begin
+					logicout <= reg1_i & reg2_i;
+				end
+				`EXE_OR_OP: begin  
+					logicout <= reg1_i | reg2_i;  
+				end  
+				`EXE_XOR_OP: begin
+					logicout <= reg1_i ^ reg2_i;
+				end
+				default:    begin  
+					logicout <= `ZeroWord;  
+				end  
+			endcase  
+		end    //if  
+	end      //always  
   
 /**************************************************************** 
 **  第二段：依据alusel_i指示的运算类型，选择一个运算结果作为最终结果 ** 
@@ -52,7 +58,6 @@ module ex(
 		case ( alusel_i )   
 			`EXE_RES_LOGIC: begin  
 				wdata_o <= logicout;    // wdata_o中存放运算结果
-				// 顺序执行????????????????
 			end  
 			default: begin  
 				wdata_o <= `ZeroWord;  
