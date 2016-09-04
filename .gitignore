@@ -3,3 +3,4 @@ mipscpu/
 *.mti
 *.mpf
 *.wlf
+wlf*
