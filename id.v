@@ -1,9 +1,10 @@
 `include "defines.v"
 
 module id(  
-	input wire              rst,  
-	input wire[`InstAddrBus]        pc_i,  
-	input wire[`InstBus]           inst_i,  
+	input wire rst,
+	input wire bbl,
+	input wire[`InstAddrBus] pc_i,  
+	input wire[`InstBus] inst_i,  
 		
 	// 读取的Regfile的值  
 	input wire[`RegBus]           reg1_data_i,  
@@ -21,10 +22,8 @@ module id(
 	output reg[`RegBus]           reg1_o,  
 	output reg[`RegBus]           reg2_o,  
 	output reg[`RegAddrBus]       wd_o,  
-	output reg                    wreg_o,
-
-	output reg bbl
-);  
+	output reg                    wreg_o
+);
     
 	// 取得指令的指令码，功能码  
 	// 对于ori指令只需通过判断第26-31bit的值，即可判断是否是ori指令  
@@ -73,7 +72,6 @@ module id(
 			reg1_addr_o <= inst_i[25:21];  // 默认通过Regfile读端口1读取的寄存器地址  
 			reg2_addr_o <= inst_i[20:16];  // 默认通过Regfile读端口2读取的寄存器地址  
 			imm <= `ZeroWord;
-			bbl <= `BblDisable;
 		
 			case (op)
 				`EXE_ANDI: begin
@@ -109,31 +107,9 @@ module id(
 				default: begin  
 				end  
 			endcase          //case op 
-		end       //if  
+		end
 	end         //always  
 	
-	always @ (*) begin
-		bbl = `BblDisable;
-		if (reg1_read_o == 1'b1) begin
-			if (reg1 != `RegNumLog2'h0 && reg1_addr_o == reg1) begin
-				bbl = `BblEnable;
-			end else if (reg2 != `RegNumLog2'h0 && reg1_addr_o == reg2) begin
-				bbl = `BblEnable;
-			end
-		end else if (reg2_read_o == 1'b1) begin
-			if (reg1 != `RegNumLog2'h0 && reg2_addr_o == reg1) begin
-				bbl = `BblEnable;
-			end else if (reg2 != `RegNumLog2'h0 && reg2_addr_o == reg2) begin
-				bbl = `BblEnable;
-			end
-		end
-		reg2 = reg1;
-		if (bbl == `BblDisable) begin
-			reg1 = wd_o;
-		end else begin
-			reg1 = `NOPRegAddr;
-		end
-	end
 
 /**************************************************************** 
 ***********         第二段：确定进行运算的源操作数1        ********* 

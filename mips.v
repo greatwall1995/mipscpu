@@ -2,15 +2,19 @@
 
 module mips(  
   
-    input   wire               clk,  
-    input  wire            rst,  
+    input wire clk,  
+    input wire rst, 
+	input wire bbl,
       
-    input wire[`RegBus]        rom_data_i,  
-    output wire[`RegBus]       rom_addr_o,  
-    output wire                rom_ce_o  
+    input wire[`RegBus] rom_data_i,  
+    output wire[`RegBus] rom_addr_o,  
+    output wire rom_ce_o,
+	output wire exp_read1,
+	output wire[`RegAddrBus] exp_addr1,
+	output wire exp_read2,
+	output wire[`RegAddrBus] exp_addr2,
+	output wire[`RegAddrBus] tar_addr
 );
-	
-	wire bbl;
   
        // 连接IF/ID模块与译码阶段ID模块的变量  
     wire[`InstAddrBus] pc;  
@@ -85,7 +89,10 @@ module mips(
       
     // 译码阶段ID模块例化  
     id id0(  
-        .rst(rst),  .pc_i(id_pc_i), .inst_i(id_inst_i),  
+        .rst(rst),
+		.bbl(bbl),
+		.pc_i(id_pc_i),
+		.inst_i(id_inst_i),  
                 
              // 来自Regfile模块的输入  
         .reg1_data_i(reg1_data),    .reg2_data_i(reg2_data),  
@@ -95,11 +102,19 @@ module mips(
         .reg1_addr_o(reg1_addr),    .reg2_addr_o(reg2_addr),   
         
         // 送到ID/EX模块的信息  
-        .aluop_o(id_aluop_o),   .alusel_o(id_alusel_o),  
-        .reg1_o(id_reg1_o),     .reg2_o(id_reg2_o),  
-        .wd_o(id_wd_o),     .wreg_o(id_wreg_o),
-		.bbl(bbl)
-    );  
+        .aluop_o(id_aluop_o),
+		.alusel_o(id_alusel_o),  
+        .reg1_o(id_reg1_o),
+		.reg2_o(id_reg2_o),  
+        .wd_o(id_wd_o),
+		.wreg_o(id_wreg_o)
+    ); 
+	
+	assign exp_read1 = reg1_read;
+	assign exp_addr1 = reg1_addr;
+	assign exp_read2 = reg2_read;
+	assign exp_addr2 = reg2_addr;
+	assign tar_addr = id_wd_o;
   
        // 通用寄存器Regfile模块例化  
     regfile regfile0(  
