@@ -2,6 +2,7 @@
 
 // bubble checker
 // can be changed to pipeline
+// bug: addr_o can not be written
 
 module bc(
 	

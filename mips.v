@@ -143,7 +143,7 @@ module mips(
       
     // EX模块例化  
     ex ex0(  
-        .rst(rst),  
+        .rst(rst),
       
         // 从ID/EX模块传递过来的的信息  
         .aluop_i(ex_aluop_i),   .alusel_i(ex_alusel_i),  

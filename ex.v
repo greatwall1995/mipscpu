@@ -2,7 +2,7 @@
 
 module ex(  
   
-    input wire             rst,  
+    input wire             rst,
       
     // 译码阶段送到执行阶段的信息  
     input wire[`AluOpBus]         aluop_i,  
@@ -15,53 +15,46 @@ module ex(
     // 执行的结果  
     output reg[`RegAddrBus]       wd_o,  
     output reg                    wreg_o,  
-    output reg[`RegBus]         wdata_o  
+    output reg[`RegBus]           wdata_o  
       
 );  
 
 	// 保存逻辑运算的结果  
-	reg[`RegBus] logicout;  
-  
-/****************************************************************** 
-**  第一段：依据aluop_i指示的运算子类型进行运算，此处只有逻辑“或”运算 ** 
-*******************************************************************/  
+	wire[`RegBus] logicres;
+	wire[`RegBus] shiftres;
+	wire[`RegBus] compareres;
+	
+	ex_logic ex_logic0(
+		.rst(rst),
+		.aluop_i(aluop_i), 
+		.alusel_i(alusel_i),
+		.reg1_i(reg1_i),
+		.reg2_i(reg2_i),
+		.wdata_o(logicres)
+	);
+	
+	ex_shift ex_shift0(
+		.rst(rst),
+		.aluop_i(aluop_i), 
+		.alusel_i(alusel_i),
+		.reg1_i(reg1_i),
+		.reg2_i(reg2_i),
+		.wdata_o(shiftres) 
+	);
+	
+	ex_compare ex_compare0(
+		.rst(rst),
+		.aluop_i(aluop_i), 
+		.alusel_i(alusel_i),
+		.reg1_i(reg1_i),
+		.reg2_i(reg2_i),
+		.wdata_o(compareres) 
+	);
 
-	always @ (*) begin  
-		if(rst == `RstEnable) begin  
-			logicout <= `ZeroWord;  
-		end else begin  
-			case (aluop_i)
-				`EXE_AND_OP: begin
-					logicout <= reg1_i & reg2_i;
-				end
-				`EXE_OR_OP: begin  
-					logicout <= reg1_i | reg2_i;  
-				end  
-				`EXE_XOR_OP: begin
-					logicout <= reg1_i ^ reg2_i;
-				end
-				default:    begin  
-					logicout <= `ZeroWord;  
-				end  
-			endcase  
-		end    //if  
-	end      //always  
-  
-/**************************************************************** 
-**  第二段：依据alusel_i指示的运算类型，选择一个运算结果作为最终结果 ** 
-**         此处只有逻辑运算结果                                 ** 
-*****************************************************************/  
-  
-	always @ (*) begin  
+	always @ (*) begin
+		// if (rst == RstEnable) begin
 		wd_o   <= wd_i;             // wd_o等于wd_i，要写的目的寄存器地址  
 		wreg_o <= wreg_i;           // wreg_o等于wreg_i，表示是否要写目的寄存器  
-		case ( alusel_i )   
-			`EXE_RES_LOGIC: begin  
-				wdata_o <= logicout;    // wdata_o中存放运算结果
-			end  
-			default: begin  
-				wdata_o <= `ZeroWord;  
-			end  
-		endcase  
+		wdata_o <= logicres | shiftres | compareres;
 	end
 endmodule  

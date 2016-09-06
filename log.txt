@@ -9,4 +9,8 @@
 
 9/5
 通过加气泡避免Hazard.
+(bubble checker忘记传入clk)
 
+9/6
+slt, sltu, slti, sltiu, and, or, xor, nor通过测试
+实现了sll, srl, sra, sllv, srlv, srav但未测试
