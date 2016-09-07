@@ -20,9 +20,11 @@ module ex(
 );  
 
 	// 保存逻辑运算的结果  
-	wire[`RegBus] logicres;
-	wire[`RegBus] shiftres;
-	wire[`RegBus] compareres;
+	wire[`RegBus]	logicres;
+	wire[`RegBus]	shiftres;
+	wire[`RegBus]	compareres;
+	wire[`RegBus]	addres;
+	wire			wreg_o_add;
 	
 	ex_logic ex_logic0(
 		.rst(rst),
@@ -50,11 +52,25 @@ module ex(
 		.reg2_i(reg2_i),
 		.wdata_o(compareres) 
 	);
+	
+	ex_add ex_add0(
+		.rst(rst),
+		.aluop_i(aluop_i), 
+		.alusel_i(alusel_i),
+		.reg1_i(reg1_i),
+		.reg2_i(reg2_i),
+		.wdata_o(addres),
+		.wreg_o(wreg_o_add)
+	);
 
 	always @ (*) begin
 		// if (rst == RstEnable) begin
 		wd_o   <= wd_i;             // wd_o等于wd_i，要写的目的寄存器地址  
-		wreg_o <= wreg_i;           // wreg_o等于wreg_i，表示是否要写目的寄存器  
-		wdata_o <= logicres | shiftres | compareres;
+		if (alusel_i == `EXE_RES_ADD) begin
+			wreg_o <= wreg_i & wreg_o_add;
+		end else begin
+			wreg_o <= wreg_i;
+		end
+		wdata_o <= logicres | shiftres | compareres | addres;
 	end
 endmodule  

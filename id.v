@@ -169,6 +169,42 @@ module id(
 							reg2_read_o <= 1'b1;  
 							instvalid   <= `InstValid;
 						end
+						`EXE_ADD: begin
+							wreg_o      <= `WriteEnable;  
+							aluop_o     <= `EXE_ADD_OP;  
+							alusel_o    <= `EXE_RES_ADD;  
+							reg1_read_o <= 1'b1;  
+							reg2_read_o <= 1'b1;  
+							instvalid   <= `InstValid;
+						end
+						`EXE_ADDU: begin
+							wreg_o      <= `WriteEnable;  
+							aluop_o     <= `EXE_ADDU_OP;  
+							alusel_o    <= `EXE_RES_ADD;  
+							reg1_read_o <= 1'b1;  
+							reg2_read_o <= 1'b1;  
+							instvalid   <= `InstValid;
+						end
+						`EXE_SUB: begin
+							wreg_o      <= `WriteEnable;  
+							aluop_o     <= `EXE_SUB_OP;  
+							alusel_o    <= `EXE_RES_ADD;  
+							reg1_read_o <= 1'b1;  
+							reg2_read_o <= 1'b1;  
+							instvalid   <= `InstValid;
+						end
+						`EXE_SUBU: begin
+							wreg_o      <= `WriteEnable;  
+							aluop_o     <= `EXE_SUBU_OP;  
+							alusel_o    <= `EXE_RES_ADD;  
+							reg1_read_o <= 1'b1;  
+							reg2_read_o <= 1'b1;  
+							instvalid   <= `InstValid;
+						end
+					//	`EXE_MULT begin
+					//	end
+					//	`EXE_MULTU begin
+					//	ends
 						default: begin 
 							aluop_o     <= `EXE_NOP_OP;  
 							alusel_o    <= `EXE_RES_NOP;  
@@ -178,7 +214,7 @@ module id(
 							reg1_read_o <= 1'b0;  
 							reg2_read_o <= 1'b0; 
 							imm <= `ZeroWord;
-						end  
+						end
 					endcase
 				end
 				`EXE_ANDI: begin
@@ -235,6 +271,26 @@ module id(
 					wreg_o      <= `WriteEnable;
 					aluop_o     <= `EXE_SLTU_OP;
 					alusel_o    <= `EXE_RES_COMPARE;
+					reg1_read_o <= 1'b1;
+					reg2_read_o <= 1'b0;
+					imm         <= {{16{inst_i[15]}}, inst_i[15:0]}; 
+					wd_o        <= inst_i[20:16];
+					instvalid   <= `InstValid;
+				end
+				`EXE_ADDI: begin
+					wreg_o      <= `WriteEnable;
+					aluop_o     <= `EXE_ADD_OP;
+					alusel_o    <= `EXE_RES_ADD;
+					reg1_read_o <= 1'b1;
+					reg2_read_o <= 1'b0;
+					imm         <= {{16{inst_i[15]}}, inst_i[15:0]}; 
+					wd_o        <= inst_i[20:16];
+					instvalid   <= `InstValid;
+				end
+				`EXE_ADDIU: begin
+					wreg_o      <= `WriteEnable;
+					aluop_o     <= `EXE_ADDU_OP;
+					alusel_o    <= `EXE_RES_ADD;
 					reg1_read_o <= 1'b1;
 					reg2_read_o <= 1'b0;
 					imm         <= {{16{inst_i[15]}}, inst_i[15:0]}; 
