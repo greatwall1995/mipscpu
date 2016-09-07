@@ -2,7 +2,7 @@
 
 module ex(  
   
-    input wire             rst,
+    input wire             		rst,
       
     // 译码阶段送到执行阶段的信息  
     input wire[`AluOpBus]         aluop_i,  
@@ -32,9 +32,9 @@ module ex(
     output reg[`RegBus]           wdata_o,
 	
     // 处于执行阶段的指令对HI、LO寄存器的写操作请求  
-    output wire[`RegBus]           hi_o,  
-    output wire[`RegBus]           lo_o,  
-    output wire                    whilo_o
+    output wire[`RegBus]		hi_o,  
+    output wire[`RegBus]		lo_o,
+    output reg					whilo_o
       
 );  
 
@@ -46,6 +46,13 @@ module ex(
 	wire[`RegBus]	moveres;
 	wire			wreg_o_add;
 	wire			wreg_o_move;
+	wire[`RegBus]		hi_move;  
+    wire[`RegBus]		lo_move; 
+	wire[`RegBus]		hi_mult;
+    wire[`RegBus]		lo_mult;
+	
+	assign hi_o = hi_move | hi_mult;
+	assign lo_o = lo_move | lo_mult;
 	
 	ex_logic ex_logic0(
 		.rst(rst),
@@ -105,20 +112,38 @@ module ex(
 		.wreg_o(wreg_o_move),
 		.wdata_o(moveres),
 		
-		.hi_o(hi_o),
-		.lo_o(lo_o),
-		.whilo_o(whilo_o)
+		.hi_o(hi_move),
+		.lo_o(lo_move)
+	);
+	
+	ex_mult ex_mult0(
+		.rst(rst),
+		.aluop_i(aluop_i),
+		.alusel_i(alusel_i),
+		.reg1_i(reg1_i),
+		.reg2_i(reg2_i),
+
+		.hi_o(hi_mult),
+		.lo_o(lo_mult)
 	);
 
 	always @ (*) begin
 		// if (rst == RstEnable) begin
-		wd_o   <= wd_i;             // wd_o等于wd_i，要写的目的寄存器地址  
+		wd_o <= wd_i;             // wd_o等于wd_i，要写的目的寄存器地址  
 		if (alusel_i == `EXE_RES_ADD) begin
 			wreg_o <= wreg_i & wreg_o_add;
 		end else if (alusel_i == `EXE_RES_MOVE) begin
 			wreg_o <= wreg_i & wreg_o_move;
 		end else begin
 			wreg_o <= wreg_i;
+		end
+		if (aluop_i == `EXE_MTHI_OP
+		|| aluop_i == `EXE_MTLO_OP
+		|| aluop_i == `EXE_MULT_OP
+		|| aluop_i == `EXE_MULTU_OP) begin
+			whilo_o <= `WriteEnable;
+		end else begin
+			whilo_o <= `WriteDisable;
 		end
 		wdata_o <= logicres | shiftres | compareres | addres
 				| moveres;

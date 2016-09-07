@@ -16,7 +16,7 @@ module run();
 	initial begin
 		rst = `RstEnable;
 		#195 rst= `RstDisable;
-		#1000 $stop;
+		#2000 $stop;
 	end
 
 	sopc sopc0(

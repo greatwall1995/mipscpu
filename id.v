@@ -201,10 +201,6 @@ module id(
 							reg2_read_o <= 1'b1;  
 							instvalid   <= `InstValid;
 						end
-					//	`EXE_MULT begin
-					//	end
-					//	`EXE_MULTU begin
-					//	ends
 						`EXE_MOVZ: begin
 							wreg_o      <= `WriteEnable;  
 							aluop_o     <= `EXE_MOVZ_OP;  
@@ -251,6 +247,22 @@ module id(
 							alusel_o    <= `EXE_RES_MOVE;  
 							reg1_read_o <= 1'b1;
 							reg2_read_o <= 1'b0;
+							instvalid   <= `InstValid;
+						end
+						`EXE_MULT: begin
+							wreg_o      <= `WriteDisable;  
+							aluop_o     <= `EXE_MULT_OP;  
+							alusel_o    <= `EXE_RES_MULT;  
+							reg1_read_o <= 1'b1;
+							reg2_read_o <= 1'b1;
+							instvalid   <= `InstValid;
+						end
+						`EXE_MULTU: begin
+							wreg_o      <= `WriteDisable;  
+							aluop_o     <= `EXE_MULTU_OP;  
+							alusel_o    <= `EXE_RES_MULT;  
+							reg1_read_o <= 1'b1;
+							reg2_read_o <= 1'b1;
 							instvalid   <= `InstValid;
 						end
 						default: begin 
