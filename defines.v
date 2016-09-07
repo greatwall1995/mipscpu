@@ -9,7 +9,7 @@
 `define ReadEnable			1'b1               //使能读  
 `define ReadDisable			1'b0               //禁止读  
 `define AluOpBus			7:0                //译码阶段的输出aluop_o的宽度  
-`define AluSelBus			2:0                //译码阶段的输出alusel_o的宽度  
+`define AluSelBus			3:0                //译码阶段的输出alusel_o的宽度  
 `define InstValid			1'b0               //指令有效  
 `define InstInvalid			1'b1               //指令无效  
 `define True_v				1'b1               //逻辑“真”  
@@ -47,6 +47,13 @@
 `define EXE_ADDI	6'b001000
 `define EXE_ADDIU	6'b001001
 
+`define EXE_MOVZ	6'b001010
+`define EXE_MOVN	6'b001011
+`define EXE_MFHI	6'b010000
+`define EXE_MTHI	6'b010001
+`define EXE_MFLO	6'b010010
+`define EXE_MTLO	6'b010011
+
 //`define EXE_CLO		6'b100000
 //`define EXE_CLZ		6'b100001
 
@@ -77,14 +84,23 @@
 `define EXE_ADDU_OP	8'b00100001
 `define EXE_SUB_OP	8'b00100010
 `define EXE_SUBU_OP	8'b00100011
+
+`define EXE_MOVZ_OP  8'b00001010
+`define EXE_MOVN_OP  8'b00001011
+`define EXE_MFHI_OP  8'b00010000
+`define EXE_MTHI_OP  8'b00010001
+`define EXE_MFLO_OP  8'b00010010
+`define EXE_MTLO_OP  8'b00010011
+
 //`define EXE_MULT_OP	8'b
   
 //AluSel  
-`define EXE_RES_NOP		3'b000  
-`define EXE_RES_LOGIC	3'b001  
-`define EXE_RES_SHIFT	3'b010
-`define EXE_RES_COMPARE	3'b011
-`define EXE_RES_ADD		3'b100
+`define EXE_RES_NOP		4'b0000  
+`define EXE_RES_LOGIC	4'b0001  
+`define EXE_RES_SHIFT	4'b0010
+`define EXE_RES_COMPARE	4'b0011
+`define EXE_RES_ADD		4'b0100
+`define EXE_RES_MOVE	4'b0101
   
   
 //*********************   与指令存储器ROM有关的宏定义   **********************  

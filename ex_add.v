@@ -6,8 +6,8 @@ module ex_add(
     input wire[`AluSelBus]	alusel_i,
     input wire[`RegBus]		reg1_i,
     input wire[`RegBus]		reg2_i,
-    output reg[`RegBus]		wdata_o,
-	output reg				wreg_o
+	output reg				wreg_o,
+    output reg[`RegBus]		wdata_o
 );
 
 	wire[`RegBus]	reg2_i_mux;
@@ -23,8 +23,8 @@ module ex_add(
 	
 	always @ (*) begin  
 		if(rst == `RstEnable || alusel_i != `EXE_RES_ADD) begin  
-			wdata_o <= `ZeroWord;
 			wreg_o <= `WriteDisable;
+			wdata_o <= `ZeroWord;
 		end else begin
 			case (aluop_i)
 				`EXE_ADD_OP, `EXE_SUB_OP: begin

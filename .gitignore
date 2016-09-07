@@ -1,5 +1,6 @@
 mipscpu/
-*.data
+inst_rom.data
+inst_rom.s
 *.mti
 *.mpf
 *.wlf
