@@ -19,3 +19,6 @@ slt, sltu, slti, sltiu, and, or, xor, nor通过测试
 实现了add, addi, addu, addiu, sub, subu
 实现的均通过测试
 实现并验证了移动操作与mult, multu
+
+9/8
+实现并验证了div, divu

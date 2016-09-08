@@ -4,7 +4,6 @@ module mem_wb(
 
 	input wire				clk,
 	input wire				rst,
-	
 
 	//来自访存阶段的信息	
 	input wire[`RegAddrBus]	mem_wd,

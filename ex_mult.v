@@ -9,7 +9,8 @@ module ex_mult(
     input wire[`RegBus]		reg2_i,
 	 
     output reg[`RegBus]		hi_o,  
-    output reg[`RegBus]		lo_o
+    output reg[`RegBus]		lo_o,
+	output reg				whilo_o
 );
 
 	wire[`RegBus]		reg1_mult;
@@ -39,8 +40,10 @@ module ex_mult(
 	
 	always @ (*) begin
 		if (rst == `RstEnable || alusel_i != `EXE_RES_MULT) begin
-			{hi_o, lo_o} <= {`ZeroWord,`ZeroWord};  
-		end else begin  
+			{hi_o, lo_o} <= {`ZeroWord,`ZeroWord}; 
+			whilo_o <= `WriteDisable; 
+		end else begin 
+			whilo_o <= `WriteEnable;
 			case (aluop_i)
 				`EXE_MULT_OP: begin
 					hi_o <= res1[63:32];

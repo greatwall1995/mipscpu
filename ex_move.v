@@ -23,7 +23,8 @@ module ex_move(
     output reg[`RegBus]		wdata_o,
 	 
     output reg[`RegBus]		hi_o,  
-    output reg[`RegBus]		lo_o
+    output reg[`RegBus]		lo_o,
+	output reg				whilo_o
 );
 	
 	reg[`RegBus]	HI;  
@@ -31,7 +32,7 @@ module ex_move(
 	
 	always @ (*) begin
 		if (rst == `RstEnable) begin  
-			{HI, LO} <= {`ZeroWord, `ZeroWord};  
+			{HI, LO} <= {`ZeroWord, `ZeroWord};
 		end else if (mem_whilo_i == `WriteEnable) begin  
 			{HI, LO} <= {mem_hi_i, mem_lo_i};   // ·Ã´æ½×¶ÎµÄÖ¸ÁîÒªÐ´HI¡¢LO¼Ä´æÆ÷  
 		end else if (wb_whilo_i == `WriteEnable) begin  
@@ -46,6 +47,7 @@ module ex_move(
 			wreg_o <= `WriteDisable;
 			wdata_o <= `ZeroWord;
 			{hi_o, lo_o} <= {`ZeroWord,`ZeroWord};  
+			whilo_o <= `WriteDisable;
 		end else begin  
 			case (aluop_i)
 				`EXE_MOVZ_OP: begin
@@ -56,6 +58,7 @@ module ex_move(
 					end else begin
 						wreg_o <= `WriteDisable;
 					end
+					whilo_o <= `WriteDisable;
 				end
 				`EXE_MOVN_OP: begin
 					{hi_o, lo_o} <= {`ZeroWord,`ZeroWord};  
@@ -65,28 +68,33 @@ module ex_move(
 					end else begin
 						wreg_o <= `WriteDisable;
 					end
+					whilo_o <= `WriteDisable;
 				end
 				`EXE_MFHI_OP: begin
 					wreg_o <= `WriteEnable;
 					wdata_o <= HI;
-					{hi_o, lo_o} <= {`ZeroWord,`ZeroWord};  
+					{hi_o, lo_o} <= {`ZeroWord,`ZeroWord};
+					whilo_o <= `WriteDisable;  
 				end
 				`EXE_MTHI_OP: begin
 					wreg_o <= `WriteDisable;
 					wdata_o <= `ZeroWord;
 					hi_o <= reg1_i;
 					lo_o <= LO;
+					whilo_o <= `WriteEnable;
 				end
 				`EXE_MFLO_OP: begin
 					wreg_o <= `WriteEnable;
 					wdata_o <= LO;
 					{hi_o, lo_o} <= {`ZeroWord,`ZeroWord};
+					whilo_o <= `WriteDisable;
 				end
 				`EXE_MTLO_OP: begin
 					wreg_o <= `WriteDisable;
 					wdata_o <= `ZeroWord;
 					lo_o <= reg1_i;
 					hi_o <= HI;
+					whilo_o <= `WriteEnable;
 				end
 			endcase  
 		end

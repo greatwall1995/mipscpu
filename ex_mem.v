@@ -2,8 +2,8 @@
 
 module ex_mem(  
   
-    input   wire               clk,  
-    input  wire            rst,  
+    input wire					clk,  
+    input wire					rst,
       
     // 来自执行阶段的信息      
     input wire[`RegAddrBus]       ex_wd,  

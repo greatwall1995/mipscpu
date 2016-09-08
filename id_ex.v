@@ -3,7 +3,8 @@
 module id_ex(  
   
     input wire clk,  
-    input wire rst,  
+    input wire rst,
+	input wire bbl,
   
       
     // 从译码阶段传递过来的信息  
@@ -25,7 +26,7 @@ module id_ex(
 );  
   
     always @ (posedge clk) begin  
-      if (rst == `RstEnable) begin  
+      if (rst == `RstEnable || bbl == `BblEnable) begin  
         ex_aluop  <= `EXE_NOP_OP;  
         ex_alusel <= `EXE_RES_NOP;  
         ex_reg1   <= `ZeroWord;  

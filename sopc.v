@@ -14,6 +14,7 @@ module sopc(
 	wire[`RegAddrBus] exp_addr2;
 	wire[`RegAddrBus] tar_addr;
 	wire bbl;
+	wire stop;
 	
 	mips mips0(
 		.clk(clk),
@@ -26,7 +27,8 @@ module sopc(
 		.exp_addr1(exp_addr1),
 		.exp_read2(exp_read2),
 		.exp_addr2(exp_addr2),
-		.tar_addr(tar_addr)
+		.tar_addr(tar_addr),
+		.stop(stop)
 	);
 	
 	inst_rom inst_rom0(
@@ -38,6 +40,7 @@ module sopc(
 	bc bc0(
 		.clk(clk),
 		.rst(rst),
+		.stop(stop),
 		.read1(exp_read1),
 		.addr1(exp_addr1),
 		.read2(exp_read2),

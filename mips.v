@@ -2,18 +2,19 @@
 
 module mips(  
   
-    input wire clk,  
-    input wire rst, 
-	input wire bbl,
+    input wire					clk,  
+    input wire					rst, 
+	input wire					bbl,
       
-    input wire[`RegBus] rom_data_i,  
-    output wire[`RegBus] rom_addr_o,  
-    output wire rom_ce_o,
-	output wire exp_read1,
-	output wire[`RegAddrBus] exp_addr1,
-	output wire exp_read2,
-	output wire[`RegAddrBus] exp_addr2,
-	output wire[`RegAddrBus] tar_addr
+    input wire[`RegBus]			rom_data_i,
+    output wire[`RegBus]		rom_addr_o,  
+    output wire					rom_ce_o,
+	output wire					exp_read1,
+	output wire[`RegAddrBus]	exp_addr1,
+	output wire					exp_read2,
+	output wire[`RegAddrBus]	exp_addr2,
+	output wire[`RegAddrBus]	tar_addr,
+	output wire					stop
 );
   
        // 连接IF/ID模块与译码阶段ID模块的变量  
@@ -44,6 +45,7 @@ module mips(
 	wire[`RegBus]		ex_hi_o;
 	wire[`RegBus]		ex_lo_o;
 	wire				ex_whilo_o;  
+	wire				ex_stop;
   
     // 连接EX/MEM模块的输出与访存阶段MEM模块的输入的变量  
     wire				mem_wreg_i;  
@@ -80,6 +82,8 @@ module mips(
 	//连接执行阶段与hilo模块的输出，读取HI、LO寄存器
 	wire[`RegBus]	hi;
 	wire[`RegBus]	lo;
+	
+	assign stop = ex_stop;
     
   // pc_reg例化  
     pc_reg pc_reg0(  
@@ -106,7 +110,6 @@ module mips(
     // 译码阶段ID模块例化  
     id id0(  
         .rst(rst),
-		.bbl(bbl),
 		.pc_i(id_pc_i),
 		.inst_i(id_inst_i),  
                 
@@ -167,7 +170,8 @@ module mips(
     // ID/EX模块例化  
     id_ex id_ex0(  
         .clk(clk),
-		.rst(rst),  
+		.rst(rst),
+		.bbl(bbl), 
           
         // 从译码阶段ID模块传递过来的信息  
         .id_aluop(id_aluop_o),
@@ -189,6 +193,7 @@ module mips(
     // EX模块例化  
     ex ex0(  
         .rst(rst),
+		.clk(clk),
       
         // 从ID/EX模块传递过来的的信息  
         .aluop_i(ex_aluop_i),
@@ -215,13 +220,15 @@ module mips(
 		
 		.hi_o(ex_hi_o),
 		.lo_o(ex_lo_o),
-		.whilo_o(ex_whilo_o)
-    );  
+		.whilo_o(ex_whilo_o),
+		
+		.stop(ex_stop)
+    );
   
     // EX/MEM模块例化  
     ex_mem ex_mem0(  
         .clk(clk),
-		.rst(rst),  
+		.rst(rst),
         
         // 来自执行阶段EX模块的信息  
         .ex_wd(ex_wd_o),
@@ -270,7 +277,7 @@ module mips(
 	// MEM/WB模块例化  
 	mem_wb mem_wb0(  
 		.clk(clk),
-		.rst(rst),  
+		.rst(rst),
 	
 		// 来自访存阶段MEM模块的信息     
 		.mem_wd(mem_wd_o),

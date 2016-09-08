@@ -3,6 +3,7 @@
 module ex(  
   
     input wire             		rst,
+	input wire					clk,
       
     // 译码阶段送到执行阶段的信息  
     input wire[`AluOpBus]         aluop_i,  
@@ -34,25 +35,38 @@ module ex(
     // 处于执行阶段的指令对HI、LO寄存器的写操作请求  
     output wire[`RegBus]		hi_o,  
     output wire[`RegBus]		lo_o,
-    output reg					whilo_o
-      
+    output wire					whilo_o,
+    
+	output wire					stop
 );  
 
 	// 保存逻辑运算的结果  
-	wire[`RegBus]	logicres;
-	wire[`RegBus]	shiftres;
-	wire[`RegBus]	compareres;
-	wire[`RegBus]	addres;
-	wire[`RegBus]	moveres;
+	wire[`RegBus]	logic_res;
+	wire[`RegBus]	shift_res;
+	wire[`RegBus]	compare_res;
+	wire[`RegBus]	add_res;
+	wire[`RegBus]	move_res;
 	wire			wreg_o_add;
 	wire			wreg_o_move;
-	wire[`RegBus]		hi_move;  
-    wire[`RegBus]		lo_move; 
-	wire[`RegBus]		hi_mult;
-    wire[`RegBus]		lo_mult;
 	
-	assign hi_o = hi_move | hi_mult;
-	assign lo_o = lo_move | lo_mult;
+	wire[`RegBus]	hi_move;  
+    wire[`RegBus]	lo_move;
+	wire			whilo_move;
+	
+	wire[`RegBus]	hi_mult;
+    wire[`RegBus]	lo_mult;
+	wire			whilo_mult;
+	
+	wire[`RegBus]	hi_div;
+    wire[`RegBus]	lo_div;
+	wire			whilo_div;
+	
+	wire			div_stop;
+	
+	assign hi_o = hi_move | hi_mult | hi_div;
+	assign lo_o = lo_move | lo_mult | lo_div;
+	assign whilo_o = whilo_move | whilo_mult | whilo_div;
+	assign stop = div_stop;
 	
 	ex_logic ex_logic0(
 		.rst(rst),
@@ -60,7 +74,7 @@ module ex(
 		.alusel_i(alusel_i),
 		.reg1_i(reg1_i),
 		.reg2_i(reg2_i),
-		.wdata_o(logicres)
+		.wdata_o(logic_res)
 	);
 	
 	ex_shift ex_shift0(
@@ -69,7 +83,7 @@ module ex(
 		.alusel_i(alusel_i),
 		.reg1_i(reg1_i),
 		.reg2_i(reg2_i),
-		.wdata_o(shiftres) 
+		.wdata_o(shift_res) 
 	);
 	
 	ex_compare ex_compare0(
@@ -78,7 +92,7 @@ module ex(
 		.alusel_i(alusel_i),
 		.reg1_i(reg1_i),
 		.reg2_i(reg2_i),
-		.wdata_o(compareres) 
+		.wdata_o(compare_res) 
 	);
 	
 	ex_add ex_add0(
@@ -88,7 +102,7 @@ module ex(
 		.reg1_i(reg1_i),
 		.reg2_i(reg2_i),
 		.wreg_o(wreg_o_add),
-		.wdata_o(addres)
+		.wdata_o(add_res)
 	);
 	
 	ex_move ex_move0(
@@ -110,10 +124,11 @@ module ex(
 		.mem_whilo_i(mem_whilo_i),
 		
 		.wreg_o(wreg_o_move),
-		.wdata_o(moveres),
+		.wdata_o(move_res),
 		
 		.hi_o(hi_move),
-		.lo_o(lo_move)
+		.lo_o(lo_move),
+		.whilo_o(whilo_move)
 	);
 	
 	ex_mult ex_mult0(
@@ -124,7 +139,23 @@ module ex(
 		.reg2_i(reg2_i),
 
 		.hi_o(hi_mult),
-		.lo_o(lo_mult)
+		.lo_o(lo_mult),
+		.whilo_o(whilo_mult)
+	);
+	
+	ex_div ex_div0(
+		.rst(rst),
+		.clk(clk),
+		.aluop_i(aluop_i),
+		.alusel_i(alusel_i),
+		.reg1_i(reg1_i),
+		.reg2_i(reg2_i),
+
+		.hi_o(hi_div),
+		.lo_o(lo_div),
+		.whilo_o(whilo_div),
+		
+		.stop(div_stop)
 	);
 
 	always @ (*) begin
@@ -137,15 +168,7 @@ module ex(
 		end else begin
 			wreg_o <= wreg_i;
 		end
-		if (aluop_i == `EXE_MTHI_OP
-		|| aluop_i == `EXE_MTLO_OP
-		|| aluop_i == `EXE_MULT_OP
-		|| aluop_i == `EXE_MULTU_OP) begin
-			whilo_o <= `WriteEnable;
-		end else begin
-			whilo_o <= `WriteDisable;
-		end
-		wdata_o <= logicres | shiftres | compareres | addres
-				| moveres;
+		wdata_o <= logic_res | shift_res | compare_res
+				| add_res | move_res;
 	end
 endmodule  
