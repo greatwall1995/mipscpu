@@ -37,7 +37,11 @@ module ex(
     output wire[`RegBus]		lo_o,
     output wire					whilo_o,
     
-	output wire					stop
+	output wire					stop,
+	
+	output reg[`AluOpBus]		aluop_o,  
+	output reg[`RegBus]		mem_addr_o,  
+	output reg[`RegBus]		reg2_o
 );  
 
 	// 保存逻辑运算的结果  
@@ -181,5 +185,10 @@ module ex(
 		end
 		wdata_o <= logic_res | shift_res | compare_res
 				| add_res | move_res | jump_res;
+		if (alusel_i == `EXE_RES_MEMORY) begin
+			aluop_o <= aluop_i;
+			mem_addr_o <= reg1_i;
+			reg2_o <= reg2_i;
+		end
 	end
 endmodule  

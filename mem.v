@@ -27,11 +27,11 @@ module mem(
 	input wire[`RegBus]		reg2_i,
 	
 	input wire[`RegBus]		mem_data_i,  
-	output wire[`RegBus]	mem_addr_o,  
-	output wire[`RegBus]	mem_data_o,  
-	output wire				mem_we_o,  
-	output wire[3:0]		mem_sel_o,  
-	output wire				mem_ce_o
+	output reg[`RegBus]		mem_addr_o,  
+	output reg[`RegBus]		mem_data_o,  
+	output reg				mem_we,  
+	output reg[3:0]			mem_sel_o,  
+	output reg				mem_ce_o
       
 );  
   

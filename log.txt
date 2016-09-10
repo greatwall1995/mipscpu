@@ -25,3 +25,5 @@ slt, sltu, slti, sltiu, and, or, xor, nor通过测试
 
 9/10
 实现并验证了jump系列指令
+实现并验证了branch系列指令
+实现并验证了lb, lw, sb, sw

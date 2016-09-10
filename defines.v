@@ -82,7 +82,6 @@
 `define EXE_BGEZAL			6'b100001
 
 `define EXE_LB				6'b100000
-`define EXE_LUI				6'b001111
 `define EXE_LW				6'b100011
 `define EXE_SB				6'b101000
 `define EXE_SW				6'b101011
@@ -128,7 +127,6 @@
 `define EXE_LINK_OP			8'b01000011
 
 `define EXE_LB_OP			8'b01100000
-`define EXE_LUI_OP			8'b01001111
 `define EXE_LW_OP			8'b01100011
 `define EXE_SB_OP			8'b01101000
 `define EXE_SW_OP			8'b01101011

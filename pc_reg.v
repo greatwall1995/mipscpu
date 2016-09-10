@@ -29,7 +29,6 @@ module pc_reg(
 	always @ (*) begin
 		if (branch_flag_i == `Branch) begin
 			pc <= branch_target_i;
-			branch_flag_i <= `NotBranch;
 		end
 	end
 

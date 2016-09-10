@@ -511,19 +511,44 @@ module id(
 					instvalid   <= `InstValid;
 				end
 				`EXE_LB: begin
-					
-				end
-				`EXE_LUI: begin
-					
+					wreg_o      <= `WriteEnable;
+					aluop_o     <= `EXE_LB_OP;
+					alusel_o    <= `EXE_RES_MEMORY;
+					reg1_read_o <= 1'b1;
+					reg2_read_o <= 1'b0;
+					imm         <= inst_i[15:0];
+					wd_o		<= inst_i[20:16];
+					instvalid   <= `InstValid;
 				end
 				`EXE_LW: begin
-					
+					wreg_o      <= `WriteEnable;
+					aluop_o     <= `EXE_LW_OP;
+					alusel_o    <= `EXE_RES_MEMORY;
+					reg1_read_o <= 1'b1;
+					reg2_read_o <= 1'b0;
+					imm         <= inst_i[15:0];
+					wd_o		<= inst_i[20:16];
+					instvalid   <= `InstValid;
 				end
 				`EXE_SW: begin
-					
+					wreg_o      <= `WriteDisable;
+					aluop_o     <= `EXE_SW_OP;
+					alusel_o    <= `EXE_RES_MEMORY;
+					reg1_read_o <= 1'b1;
+					reg2_read_o <= 1'b1;
+					imm         <= inst_i[15:0];
+					wd_o		<= `ZeroWord;
+					instvalid   <= `InstValid;
 				end
 				`EXE_SB: begin
-					
+					wreg_o      <= `WriteDisable;
+					aluop_o     <= `EXE_SB_OP;
+					alusel_o    <= `EXE_RES_MEMORY;
+					reg1_read_o <= 1'b1;
+					reg2_read_o <= 1'b1;
+					imm         <= inst_i[15:0];
+					wd_o		<= `ZeroWord;
+					instvalid   <= `InstValid;
 				end
 				default: begin 
 					aluop_o     <= `EXE_NOP_OP;  
@@ -562,6 +587,10 @@ module id(
 			end
 		end else if (op == `EXE_JAL) begin
 			reg1_o <= pc_plus_8;
+		end
+		if (alusel_o == `EXE_RES_MEMORY) begin
+			reg1_o <= reg1_data_i + {16'h0000, inst_i[15:0]};
+					
 		end
 	end  
 

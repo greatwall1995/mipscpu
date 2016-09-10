@@ -63,13 +63,13 @@ module sopc(
 	);
 	
 	data_ram data_ram0(
-		clk(clk),  
-		ce(mem_ce_o),
-		we(mem_we_o),
-		addr(mem_addr_o),
-		sel(mem_sel_o),
-		data_i(mem_data_o),
-		data_o(mem_data_i)
+		.clk(clk),  
+		.ce(mem_ce_o),
+		.we(mem_we_o),
+		.addr(mem_addr_o),
+		.sel(mem_sel_o),
+		.data_i(mem_data_o),
+		.data_o(mem_data_i)
 	);
 
 endmodule

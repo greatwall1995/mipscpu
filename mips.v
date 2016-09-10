@@ -56,6 +56,9 @@ module mips(
 	wire[`RegBus]		ex_lo_o;
 	wire				ex_whilo_o;  
 	wire				ex_stop;
+	wire[`AluOpBus]		ex_aluop_o;
+	wire[`RegBus]		ex_mem_addr_o;
+	wire[`RegBus]		ex_reg2_o;
   
     // 连接EX/MEM模块的输出与访存阶段MEM模块的输入的变量  
     wire				mem_wreg_i;  
@@ -63,7 +66,11 @@ module mips(
     wire[`RegBus]		mem_wdata_i;  
 	wire[`RegBus]		mem_hi_i;
 	wire[`RegBus]		mem_lo_i;
-	wire				mem_whilo_i;	
+	wire				mem_whilo_i;
+	
+	wire[`AluOpBus]		mem_aluop_i;
+	wire[`RegBus]		mem_mem_addr_i;
+	wire[`RegBus]		mem_reg2_i;	
   
     // 连接访存阶段MEM模块的输出与MEM/WB模块的输入的变量  
     wire				mem_wreg_o;  
@@ -238,7 +245,10 @@ module mips(
 		.lo_o(ex_lo_o),
 		.whilo_o(ex_whilo_o),
 		
-		.stop(ex_stop)
+		.stop(ex_stop),
+		.aluop_o(ex_aluop_o),
+		.mem_addr_o(ex_mem_addr_o),
+		.reg2_o(ex_reg2_o)
     );
   
     // EX/MEM模块例化  
@@ -255,6 +265,10 @@ module mips(
 		.ex_hi(ex_hi_o),
 		.ex_lo(ex_lo_o),
 		.ex_whilo(ex_whilo_o),
+		
+		.ex_aluop(ex_aluop_o),
+		.ex_mem_addr(ex_mem_addr_o),
+		.ex_reg2(ex_reg2_o),
       
         // 送到访存阶段MEM模块的信息  
         .mem_wd(mem_wd_i),
@@ -264,7 +278,11 @@ module mips(
 		
 		.mem_hi(mem_hi_i),
 		.mem_lo(mem_lo_i),
-		.mem_whilo(mem_whilo_i)
+		.mem_whilo(mem_whilo_i),
+		
+		.mem_aluop(mem_aluop_i),
+		.mem_mem_addr(mem_mem_addr_i),
+		.mem_reg2(mem_reg2_i)
     );  
       
        // MEM模块例化  
@@ -289,10 +307,14 @@ module mips(
 		
 		.hi_o(mem_hi_o),
 		.lo_o(mem_lo_o),
-		.whilo_o(mem_whilo_o)
+		.whilo_o(mem_whilo_o),
+		
+		.aluop_i(mem_aluop_i),
+		.mem_addr_i(mem_mem_addr_i),
+		.reg2_i(mem_reg2_i),
   
 		.mem_addr_o(mem_addr_o),  
-		.mem_we_o(mem_we_o),  
+		.mem_we(mem_we_o),  
 		.mem_sel_o(mem_sel_o),  
 		.mem_data_o(mem_data_o),  
 		.mem_ce_o(mem_ce_o)
