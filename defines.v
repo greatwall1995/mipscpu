@@ -71,11 +71,27 @@
 `define EXE_JALR			6'b001001
 `define EXE_J				6'b000010
 `define EXE_JAL				6'b000011
+
+`define EXE_BEQ				6'b000100
+`define EXE_BNE				6'b000101
+`define EXE_BLEZ			6'b000110
+`define EXE_BGTZ			6'b000111
+`define EXE_BLTZ			6'b000000
+`define EXE_BGEZ			6'b000001
+`define EXE_BLTZAL			6'b100000
+`define EXE_BGEZAL			6'b100001
+
+`define EXE_LB				6'b100000
+`define EXE_LUI				6'b001111
+`define EXE_LW				6'b100011
+`define EXE_SB				6'b101000
+`define EXE_SW				6'b101011
   
 `define EXE_SYNC			6'b001111         //sync指令的功能码  
 `define EXE_PREF			6'b110011         //pref指令的指令码  
 `define EXE_SPECIAL_INST	6'b000000  //SPECIAL类指令的指令码  
-  
+`define EXE_REGIMM_INST		6'b000001
+
 //AluOp  
 `define EXE_NOP_OP			8'b00000000 
 
@@ -109,7 +125,13 @@
 `define EXE_DIV_OP			8'b00011010
 `define EXE_DIVU_OP			8'b00011011
 
-`define EXE_JAL_OP			8'b01000011
+`define EXE_LINK_OP			8'b01000011
+
+`define EXE_LB_OP			8'b01100000
+`define EXE_LUI_OP			8'b01001111
+`define EXE_LW_OP			8'b01100011
+`define EXE_SB_OP			8'b01101000
+`define EXE_SW_OP			8'b01101011
   
 //AluSel  
 `define EXE_RES_NOP			4'b0000  
@@ -120,8 +142,9 @@
 `define EXE_RES_MOVE		4'b0101
 `define EXE_RES_MULT		4'b0110
 `define EXE_RES_DIV			4'b0111
-`define EXE_RES_JUMP		4'b1000
-  
+`define EXE_RES_LINK		4'b1000
+`define EXE_RES_MEMORY		4'b1001
+
   
 //*********************   与指令存储器ROM有关的宏定义   **********************  
 `define InstAddrBus          31:0               //ROM的地址总线宽度  
@@ -139,3 +162,9 @@
 `define RegNum               32                 //通用寄存器的数量  
 `define RegNumLog2           5                  //寻址通用寄存器使用的地址位数  
 `define NOPRegAddr           5'b00000  
+
+`define DataAddrBus			31:0           //地址总线宽度  
+`define DataBus				31:0           //数据总线宽度  
+`define DataMemNum			131071         //RAM的大小，单位是字，此处是128K word   
+`define DataMemNumLog2		17             //实际使用到的地址宽度  
+`define ByteWidth			7:0            //一个字节的宽度，是8bit  

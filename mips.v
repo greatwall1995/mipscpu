@@ -9,6 +9,14 @@ module mips(
     input wire[`RegBus]			rom_data_i,
     output wire[`RegBus]		rom_addr_o,  
     output wire					rom_ce_o,
+	
+	input wire[`RegBus]			mem_data_i,  
+	output wire[`RegBus]		mem_addr_o,  
+	output wire[`RegBus]		mem_data_o,  
+	output wire					mem_we_o,  
+	output wire[3:0]			mem_sel_o,  
+	output wire					mem_ce_o,  
+	
 	output wire					exp_read1,
 	output wire[`RegAddrBus]	exp_addr1,
 	output wire					exp_read2,
@@ -271,6 +279,8 @@ module mips(
 		.hi_i(mem_hi_i),
 		.lo_i(mem_lo_i),
 		.whilo_i(mem_whilo_i),
+		
+		.mem_data_i(mem_data_i),  
         
         // 送到MEM/WB模块的信息  
         .wd_o(mem_wd_o),
@@ -280,6 +290,12 @@ module mips(
 		.hi_o(mem_hi_o),
 		.lo_o(mem_lo_o),
 		.whilo_o(mem_whilo_o)
+  
+		.mem_addr_o(mem_addr_o),  
+		.mem_we_o(mem_we_o),  
+		.mem_sel_o(mem_sel_o),  
+		.mem_data_o(mem_data_o),  
+		.mem_ce_o(mem_ce_o)
     );  
   
 	// MEM/WB模块例化  

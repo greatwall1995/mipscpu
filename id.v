@@ -308,9 +308,9 @@ module id(
 						end
 						`EXE_JALR: begin
 							wreg_o		<= `WriteEnable;
-							aluop_o		<= `EXE_JAL_OP;
-							alusel_o	<= `EXE_RES_JUMP;
-							reg1_read_o	<= 1'b0;
+							aluop_o		<= `EXE_LINK_OP;
+							alusel_o	<= `EXE_RES_LINK;
+							reg1_read_o	<= 1'b1;
 							reg2_read_o	<= 1'b0;
 							instvalid	<= `InstValid;
 						end
@@ -323,6 +323,50 @@ module id(
 							reg1_read_o <= 1'b0;  
 							reg2_read_o <= 1'b0; 
 							imm <= `ZeroWord;
+						end
+					endcase
+				end
+				`EXE_REGIMM_INST: begin
+					case (op4)
+						`EXE_BLTZ: begin
+							wreg_o      <= `WriteDisable;
+							aluop_o     <= `EXE_NOP_OP;
+							alusel_o    <= `EXE_RES_NOP;
+							reg1_read_o <= 1'b1;
+							reg2_read_o <= 1'b0;
+							imm         <= `ZeroWord;
+							wd_o		<= inst_i[20:16];
+							instvalid   <= `InstValid;
+						end
+						`EXE_BGEZ: begin
+							wreg_o      <= `WriteDisable;
+							aluop_o     <= `EXE_NOP_OP;
+							alusel_o    <= `EXE_RES_NOP;
+							reg1_read_o <= 1'b1;
+							reg2_read_o <= 1'b0;
+							imm         <= `ZeroWord;
+							wd_o		<= inst_i[20:16];
+							instvalid   <= `InstValid;
+						end
+						`EXE_BLTZAL: begin
+							wreg_o      <= `WriteEnable;
+							aluop_o     <= `EXE_LINK_OP;
+							alusel_o    <= `EXE_RES_LINK;
+							reg1_read_o <= 1'b1;
+							reg2_read_o <= 1'b0;
+							imm         <= `ZeroWord;
+							wd_o		<= 5'b11111;
+							instvalid   <= `InstValid;
+						end
+						`EXE_BGEZAL: begin
+							wreg_o      <= `WriteEnable;
+							aluop_o     <= `EXE_LINK_OP;
+							alusel_o    <= `EXE_RES_LINK;
+							reg1_read_o <= 1'b1;
+							reg2_read_o <= 1'b0;
+							imm         <= `ZeroWord;
+							wd_o		<= 5'b11111;
+							instvalid   <= `InstValid;
 						end
 					endcase
 				end
@@ -418,13 +462,68 @@ module id(
 				end
 				`EXE_JAL: begin
 					wreg_o      <= `WriteEnable;
-					aluop_o     <= `EXE_JAL_OP;
-					alusel_o    <= `EXE_RES_JUMP;
+					aluop_o     <= `EXE_LINK_OP;
+					alusel_o    <= `EXE_RES_LINK;
 					reg1_read_o <= 1'b0;
 					reg2_read_o <= 1'b0;
 					imm         <= `ZeroWord;
 					wd_o		<= 5'b11111;
 					instvalid   <= `InstValid;
+				end
+				`EXE_BEQ: begin
+					wreg_o      <= `WriteDisable;
+					aluop_o     <= `EXE_NOP_OP;
+					alusel_o    <= `EXE_RES_NOP;
+					reg1_read_o <= 1'b1;
+					reg2_read_o <= 1'b1;
+					imm         <= `ZeroWord;
+					wd_o		<= inst_i[20:16];
+					instvalid   <= `InstValid;
+				end
+				`EXE_BNE: begin
+					wreg_o      <= `WriteDisable;
+					aluop_o     <= `EXE_NOP_OP;
+					alusel_o    <= `EXE_RES_NOP;
+					reg1_read_o <= 1'b1;
+					reg2_read_o <= 1'b1;
+					imm         <= `ZeroWord;
+					wd_o		<= inst_i[20:16];
+					instvalid   <= `InstValid;
+				end
+				`EXE_BLEZ: begin
+					wreg_o      <= `WriteDisable;
+					aluop_o     <= `EXE_NOP_OP;
+					alusel_o    <= `EXE_RES_NOP;
+					reg1_read_o <= 1'b1;
+					reg2_read_o <= 1'b0;
+					imm         <= `ZeroWord;
+					wd_o		<= inst_i[20:16];
+					instvalid   <= `InstValid;
+				end
+				`EXE_BGTZ: begin
+					wreg_o      <= `WriteDisable;
+					aluop_o     <= `EXE_NOP_OP;
+					alusel_o    <= `EXE_RES_NOP;
+					reg1_read_o <= 1'b1;
+					reg2_read_o <= 1'b0;
+					imm         <= `ZeroWord;
+					wd_o		<= inst_i[20:16];
+					instvalid   <= `InstValid;
+				end
+				`EXE_LB: begin
+					
+				end
+				`EXE_LUI: begin
+					
+				end
+				`EXE_LW: begin
+					
+				end
+				`EXE_SW: begin
+					
+				end
+				`EXE_SB: begin
+					
 				end
 				default: begin 
 					aluop_o     <= `EXE_NOP_OP;  
@@ -442,7 +541,7 @@ module id(
 	
 
 /**************************************************************** 
-***********         第二段：确定进行运算的源操作数1        ********* 
+***********         第二段：确定进行运算的源操作数1     ********* 
 *****************************************************************/  
      
 	always @ (*) begin  
@@ -457,15 +556,15 @@ module id(
 		end
 		if (op == `EXE_SPECIAL_INST && op3 == `EXE_JALR) begin
 			reg1_o <= pc_plus_8;
+		end else if (op == `EXE_REGIMM_INST) begin
+			if (op4 == `EXE_BLTZAL || op4 == `EXE_BGEZAL) begin
+				reg1_o <= pc_plus_8;
+			end
 		end else if (op == `EXE_JAL) begin
 			reg1_o <= pc_plus_8;
 		end
 	end  
-	
-/**************************************************************** 
-***********         第三段：确定进行运算的源操作数2        ********* 
-*****************************************************************/  
-	
+
 	always @ (*) begin  
 		if(rst == `RstEnable) begin  
 			reg2_o <= `ZeroWord;  
@@ -478,6 +577,10 @@ module id(
 		end
 		if (op == `EXE_SPECIAL_INST && op3 == `EXE_JALR) begin
 			reg2_o <= `ZeroWord;
+		end else if (op == `EXE_REGIMM_INST) begin
+			if (op4 == `EXE_BLTZAL || op4 == `EXE_BGEZAL) begin
+				reg2_o <= `ZeroWord;
+			end
 		end else if (op == `EXE_JAL) begin
 			reg2_o <= `ZeroWord;
 		end
@@ -491,7 +594,39 @@ module id(
 			end
 		end else if (op == `EXE_J || op == `EXE_JAL) begin
 			branch_flag_o <= `Branch;
-			branch_target_o <= {pc_plus_4[31:28], inst_i[25:0],2'b00};
+			branch_target_o <= {pc_plus_4[31:28], inst_i[25:0], 2'b00};
+		end else if (op == `EXE_REGIMM_INST) begin
+			if (op4 == `EXE_BLTZ || op4 == `EXE_BLTZAL) begin
+				if (reg1_data_i < 0) begin
+					branch_flag_o = `Branch;
+					branch_target_o <= pc_plus_4 + {14'b00000000000000, inst_i[15:0], 2'b00};
+				end
+			end else if (op4 == `EXE_BGEZ || op4 == `EXE_BGEZAL) begin
+				if (reg1_data_i >= 0) begin
+					branch_flag_o = `Branch;
+					branch_target_o <= pc_plus_4 + {14'b00000000000000, inst_i[15:0], 2'b00};
+				end
+			end
+		end else if (op == `EXE_BEQ) begin
+			if (reg1_data_i == reg2_data_i) begin
+				branch_flag_o = `Branch;
+				branch_target_o <= pc_plus_4 + {14'b00000000000000, inst_i[15:0], 2'b00};
+			end
+		end else if (op == `EXE_BNE) begin
+			if (reg1_data_i != reg2_data_i) begin
+				branch_flag_o = `Branch;
+				branch_target_o <= pc_plus_4 + {14'b00000000000000, inst_i[15:0], 2'b00};
+			end
+		end else if (op == `EXE_BGTZ) begin
+			if (reg1_data_i > 0) begin
+				branch_flag_o = `Branch;
+				branch_target_o <= pc_plus_4 + {14'b00000000000000, inst_i[15:0], 2'b00};
+			end
+		end else if (op == `EXE_BLEZ) begin
+			if (reg1_data_i <= 0) begin
+				branch_flag_o = `Branch;
+				branch_target_o <= pc_plus_4 + {14'b00000000000000, inst_i[15:0], 2'b00};
+			end
 		end
 	end
 	

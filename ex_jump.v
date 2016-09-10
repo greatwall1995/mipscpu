@@ -1,6 +1,6 @@
 `include "defines.v"
 
-module ex_jump(
+module ex_link(
 	input wire				rst,
 	input wire[`AluOpBus]	aluop_i,
     input wire[`AluSelBus]	alusel_i,
@@ -10,7 +10,7 @@ module ex_jump(
 );
 	
 	always @ (*) begin
-		if(rst == `RstEnable || alusel_i != `EXE_RES_JUMP) begin  
+		if(rst == `RstEnable || alusel_i != `EXE_RES_LINK) begin  
 			wdata_o <= `ZeroWord;  
 		end else begin
 			wdata_o <= reg1_i;

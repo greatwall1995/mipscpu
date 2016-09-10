@@ -160,7 +160,7 @@ module ex(
 		.stop(div_stop)
 	);
 	
-	ex_jump ex_jump0(
+	ex_link ex_link0(
 		.rst(rst),
 		.aluop_i(aluop_i),
 		.alusel_i(alusel_i),
