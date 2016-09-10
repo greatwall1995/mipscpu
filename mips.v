@@ -18,17 +18,19 @@ module mips(
 );
   
        // 连接IF/ID模块与译码阶段ID模块的变量  
-    wire[`InstAddrBus] pc;  
-    wire[`InstAddrBus] id_pc_i;  
-    wire[`InstBus]     id_inst_i;  
+    wire[`InstAddrBus]	pc;  
+    wire[`InstAddrBus]	id_pc_i;  
+    wire[`InstBus]		id_inst_i;  
+	wire				branch_flag;
+	wire[`InstAddrBus]	branch_target;
       
     // 连接译码阶段ID模块输出与ID/EX模块的输入的变量  
-    wire[`AluOpBus]    id_aluop_o;  
-    wire[`AluSelBus]   id_alusel_o;  
-    wire[`RegBus]      id_reg1_o;  
-    wire[`RegBus]      id_reg2_o;  
-    wire               id_wreg_o;  
-    wire[`RegAddrBus]  id_wd_o;  
+    wire[`AluOpBus]		id_aluop_o;  
+    wire[`AluSelBus]	id_alusel_o;  
+    wire[`RegBus]		id_reg1_o;  
+    wire[`RegBus]		id_reg2_o;  
+    wire 				id_wreg_o;  
+    wire[`RegAddrBus]	id_wd_o;  
       
     // 连接ID/EX模块输出与执行阶段EX模块的输入的变量  
     wire[`AluOpBus]    ex_aluop_i;  
@@ -90,6 +92,8 @@ module mips(
 		.clk(clk),
 		.rst(rst),
 		.bbl(bbl),
+		.branch_flag_i(branch_flag),
+		.branch_target_i(branch_target),
 		.pc(pc),
 		.ce(rom_ce_o)  
     );  
@@ -103,6 +107,8 @@ module mips(
 		.bbl(bbl),
 		.if_pc(pc),
         .if_inst(rom_data_i),
+		.branch_flag_i(branch_flag),
+		.branch_target_i(branch_target),
 		.id_pc(id_pc_i),
         .id_inst(id_inst_i)
     );  
@@ -113,7 +119,7 @@ module mips(
 		.pc_i(id_pc_i),
 		.inst_i(id_inst_i),  
                 
-             // 来自Regfile模块的输入  
+        // 来自Regfile模块的输入  
         .reg1_data_i(reg1_data),
 		.reg2_data_i(reg2_data),  
   
@@ -129,7 +135,9 @@ module mips(
         .reg1_o(id_reg1_o),
 		.reg2_o(id_reg2_o),  
         .wd_o(id_wd_o),
-		.wreg_o(id_wreg_o)
+		.wreg_o(id_wreg_o),
+		.branch_flag_o(branch_flag),
+		.branch_target_o(branch_target)
     ); 
 	
 	assign exp_read1 = reg1_read;

@@ -46,6 +46,8 @@ module ex(
 	wire[`RegBus]	compare_res;
 	wire[`RegBus]	add_res;
 	wire[`RegBus]	move_res;
+	wire[`RegBus]	jump_res;
+	
 	wire			wreg_o_add;
 	wire			wreg_o_move;
 	
@@ -157,6 +159,15 @@ module ex(
 		
 		.stop(div_stop)
 	);
+	
+	ex_jump ex_jump0(
+		.rst(rst),
+		.aluop_i(aluop_i),
+		.alusel_i(alusel_i),
+		.reg1_i(reg1_i),
+		.reg2_i(reg2_i),
+		.wdata_o(jump_res)
+	);
 
 	always @ (*) begin
 		// if (rst == RstEnable) begin
@@ -169,6 +180,6 @@ module ex(
 			wreg_o <= wreg_i;
 		end
 		wdata_o <= logic_res | shift_res | compare_res
-				| add_res | move_res;
+				| add_res | move_res | jump_res;
 	end
 endmodule  

@@ -18,6 +18,8 @@
 `define ChipDisable			1'b0               //芯片禁止  
 `define Stop				1'b1
 `define NotStop				1'b0
+`define Branch				1'b1
+`define NotBranch			1'b0
   
 //*********************   与具体指令有关的宏定义  *****************************  
 `define EXE_AND				6'b100100          // and指令的功能码  
@@ -64,6 +66,11 @@
 
 `define EXE_DIV				6'b011010
 `define EXE_DIVU			6'b011011
+
+`define EXE_JR				6'b001000
+`define EXE_JALR			6'b001001
+`define EXE_J				6'b000010
+`define EXE_JAL				6'b000011
   
 `define EXE_SYNC			6'b001111         //sync指令的功能码  
 `define EXE_PREF			6'b110011         //pref指令的指令码  
@@ -101,6 +108,8 @@
 
 `define EXE_DIV_OP			8'b00011010
 `define EXE_DIVU_OP			8'b00011011
+
+`define EXE_JAL_OP			8'b01000011
   
 //AluSel  
 `define EXE_RES_NOP			4'b0000  
@@ -111,6 +120,7 @@
 `define EXE_RES_MOVE		4'b0101
 `define EXE_RES_MULT		4'b0110
 `define EXE_RES_DIV			4'b0111
+`define EXE_RES_JUMP		4'b1000
   
   
 //*********************   与指令存储器ROM有关的宏定义   **********************  

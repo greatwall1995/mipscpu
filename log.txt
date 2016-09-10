@@ -22,3 +22,6 @@ slt, sltu, slti, sltiu, and, or, xor, nor通过测试
 
 9/8
 实现并验证了div, divu
+
+9/10
+实现并验证了jump系列指令

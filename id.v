@@ -1,35 +1,37 @@
 `include "defines.v"
 
 module id(  
-	input wire rst,
-	input wire[`InstAddrBus] pc_i,  
-	input wire[`InstBus] inst_i,  
+	input wire					rst,
+	input wire[`InstAddrBus]	pc_i,  
+	input wire[`InstBus]		inst_i,  
 		
 	// 读取的Regfile的值  
-	input wire[`RegBus]           reg1_data_i,  
-	input wire[`RegBus]           reg2_data_i,  
+	input wire[`RegBus]			reg1_data_i,  
+	input wire[`RegBus]			reg2_data_i,  
 	
 	// 输出到Regfile的信息  
-	output reg                    reg1_read_o,  
-	output reg                    reg2_read_o,       
-	output reg[`RegAddrBus]       reg1_addr_o,  
-	output reg[`RegAddrBus]       reg2_addr_o,   
+	output reg					reg1_read_o,  
+	output reg					reg2_read_o,       
+	output reg[`RegAddrBus]		reg1_addr_o,  
+	output reg[`RegAddrBus]		reg2_addr_o,   
 	
 	// 送到执行阶段的信息  
-	output reg[`AluOpBus]         aluop_o,  
-	output reg[`AluSelBus]        alusel_o,  
-	output reg[`RegBus]           reg1_o,  
-	output reg[`RegBus]           reg2_o,  
-	output reg[`RegAddrBus]       wd_o,  
-	output reg                    wreg_o
+	output reg[`AluOpBus]		aluop_o,  
+	output reg[`AluSelBus]		alusel_o,  
+	output reg[`RegBus]			reg1_o,  
+	output reg[`RegBus]			reg2_o,  
+	output reg[`RegAddrBus]		wd_o,  
+	output reg					wreg_o,
+	output reg					branch_flag_o,
+	output reg[`InstAddrBus]	branch_target_o
 );
     
 	// 取得指令的指令码，功能码  
 	// 对于ori指令只需通过判断第26-31bit的值，即可判断是否是ori指令  
-	wire[5:0] op  = inst_i[31:26];  
-	wire[4:0] op2 = inst_i[10:6];  
-	wire[5:0] op3 = inst_i[5:0];  
-	wire[4:0] op4 = inst_i[20:16];  
+	wire[5:0] op  = inst_i[31:26];
+	wire[4:0] op2 = inst_i[10:6];
+	wire[5:0] op3 = inst_i[5:0];
+	wire[4:0] op4 = inst_i[20:16];
 	
 	// 保存指令执行需要的立即数  
 	reg[`RegBus] imm;
@@ -38,6 +40,12 @@ module id(
 	
 	// 指示指令是否有效  
 	reg instvalid;  			// ?????????????????????
+	
+	wire[`InstAddrBus] pc_plus_4;
+	wire[`InstAddrBus] pc_plus_8;
+	
+	assign pc_plus_4 = pc_i + 4;
+	assign pc_plus_8 = pc_i + 8;
 	
 	initial begin
 		reg1 <= `RegNumLog2'h0;
@@ -59,11 +67,13 @@ module id(
 			reg2_read_o <= 1'b0;  
 			reg1_addr_o <= `NOPRegAddr;  
 			reg2_addr_o <= `NOPRegAddr;  
-			imm         <= 32'h0;              
+			imm         <= 32'h0;
+			branch_flag_o <= `NotBranch;
 		end else begin  
 		
 			reg1_addr_o <= inst_i[25:21];  // 默认通过Regfile读端口1读取的寄存器地址  
 			reg2_addr_o <= inst_i[20:16];  // 默认通过Regfile读端口2读取的寄存器地址  
+			branch_flag_o <= `NotBranch;
 			
 			case (op)
 				`EXE_SPECIAL_INST: begin
@@ -280,6 +290,30 @@ module id(
 							reg2_read_o <= 1'b1;
 							instvalid   <= `InstValid;
 						end
+						`EXE_JR: begin
+							wreg_o		<= `WriteDisable;
+							aluop_o		<= `EXE_NOP_OP;
+							alusel_o	<= `EXE_RES_NOP;
+							reg1_read_o	<= 1'b1;
+							reg2_read_o	<= 1'b0;
+							instvalid	<= `InstValid;
+						end
+						`EXE_JR: begin
+							wreg_o		<= `WriteDisable;
+							aluop_o		<= `EXE_NOP_OP;
+							alusel_o	<= `EXE_RES_NOP;
+							reg1_read_o	<= 1'b1;
+							reg2_read_o	<= 1'b0;
+							instvalid	<= `InstValid;
+						end
+						`EXE_JALR: begin
+							wreg_o		<= `WriteEnable;
+							aluop_o		<= `EXE_JAL_OP;
+							alusel_o	<= `EXE_RES_JUMP;
+							reg1_read_o	<= 1'b0;
+							reg2_read_o	<= 1'b0;
+							instvalid	<= `InstValid;
+						end
 						default: begin 
 							aluop_o     <= `EXE_NOP_OP;  
 							alusel_o    <= `EXE_RES_NOP;  
@@ -372,6 +406,26 @@ module id(
 					wd_o        <= inst_i[20:16];
 					instvalid   <= `InstValid;
 				end
+				`EXE_J: begin
+					wreg_o      <= `WriteDisable;
+					aluop_o     <= `EXE_NOP_OP;
+					alusel_o    <= `EXE_RES_NOP;
+					reg1_read_o <= 1'b0;
+					reg2_read_o <= 1'b0;
+					imm         <= `ZeroWord; 
+					wd_o        <= inst_i[20:16];
+					instvalid   <= `InstValid;
+				end
+				`EXE_JAL: begin
+					wreg_o      <= `WriteEnable;
+					aluop_o     <= `EXE_JAL_OP;
+					alusel_o    <= `EXE_RES_JUMP;
+					reg1_read_o <= 1'b0;
+					reg2_read_o <= 1'b0;
+					imm         <= `ZeroWord;
+					wd_o		<= 5'b11111;
+					instvalid   <= `InstValid;
+				end
 				default: begin 
 					aluop_o     <= `EXE_NOP_OP;  
 					alusel_o    <= `EXE_RES_NOP;  
@@ -400,7 +454,12 @@ module id(
 			reg1_o <= imm;           // 立即数  
 		end else begin  
 			reg1_o <= `ZeroWord;  
-		end  
+		end
+		if (op == `EXE_SPECIAL_INST && op3 == `EXE_JALR) begin
+			reg1_o <= pc_plus_8;
+		end else if (op == `EXE_JAL) begin
+			reg1_o <= pc_plus_8;
+		end
 	end  
 	
 /**************************************************************** 
@@ -416,7 +475,24 @@ module id(
 			reg2_o <= imm;           // 立即数  
 		end else begin  
 			reg2_o <= `ZeroWord;  
-		end  
-	end  
+		end
+		if (op == `EXE_SPECIAL_INST && op3 == `EXE_JALR) begin
+			reg2_o <= `ZeroWord;
+		end else if (op == `EXE_JAL) begin
+			reg2_o <= `ZeroWord;
+		end
+	end
+	
+	always @ (*) begin
+		if (op == `EXE_SPECIAL_INST) begin
+			if (op3 == `EXE_JR || op3 == `EXE_JALR) begin
+				branch_flag_o <= `Branch;
+				branch_target_o <= reg1_data_i;
+			end
+		end else if (op == `EXE_J || op == `EXE_JAL) begin
+			branch_flag_o <= `Branch;
+			branch_target_o <= {pc_plus_4[31:28], inst_i[25:0],2'b00};
+		end
+	end
 	
 endmodule  
