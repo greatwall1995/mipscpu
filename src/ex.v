@@ -175,7 +175,8 @@ module ex(
 
 	always @ (*) begin
 		// if (rst == RstEnable) begin
-		wd_o <= wd_i;             // wd_o等于wd_i，要写的目的寄存器地址  
+		wd_o <= wd_i;     
+		aluop_o <= aluop_i;        // wd_o等于wd_i，要写的目的寄存器地址  
 		if (alusel_i == `EXE_RES_ADD) begin
 			wreg_o <= wreg_i & wreg_o_add;
 		end else if (alusel_i == `EXE_RES_MOVE) begin
@@ -186,7 +187,6 @@ module ex(
 		wdata_o <= logic_res | shift_res | compare_res
 				| add_res | move_res | jump_res;
 		if (alusel_i == `EXE_RES_MEMORY) begin
-			aluop_o <= aluop_i;
 			mem_addr_o <= reg1_i;
 			reg2_o <= reg2_i;
 		end

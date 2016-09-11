@@ -123,7 +123,6 @@ module mips(
 		.if_pc(pc),
         .if_inst(rom_data_i),
 		.branch_flag_i(branch_flag),
-		.branch_target_i(branch_target),
 		.id_pc(id_pc_i),
         .id_inst(id_inst_i)
     );  

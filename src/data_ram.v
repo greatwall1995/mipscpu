@@ -15,7 +15,7 @@ module data_ram(
 	reg[`ByteWidth]  data_mem0[0:`DataMemNum-1];  
 	reg[`ByteWidth]  data_mem1[0:`DataMemNum-1];  
 	reg[`ByteWidth]  data_mem2[0:`DataMemNum-1];  
-	reg[`ByteWidth]  data_mem3[0:`DataMemNum-1];  
+	reg[`ByteWidth]  data_mem3[0:`DataMemNum-1];
 	
 	// Ð´²Ù×÷  
 	always @ (posedge clk) begin  

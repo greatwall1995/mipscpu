@@ -22,13 +22,11 @@ module pc_reg(
 		if (ce == `ChipDisable) begin
 			pc <= 32'h00000000;
 		end else if (bbl == `BblDisable) begin
-			pc <= pc + 4'h4;
-		end
-	end
-	
-	always @ (*) begin
-		if (branch_flag_i == `Branch) begin
-			pc <= branch_target_i;
+			if (branch_flag_i == `Branch) begin
+				pc <= branch_target_i;
+			end else begin
+				pc <= pc + 4'h4;
+			end
 		end
 	end
 

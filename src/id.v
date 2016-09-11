@@ -298,14 +298,6 @@ module id(
 							reg2_read_o	<= 1'b0;
 							instvalid	<= `InstValid;
 						end
-						`EXE_JR: begin
-							wreg_o		<= `WriteDisable;
-							aluop_o		<= `EXE_NOP_OP;
-							alusel_o	<= `EXE_RES_NOP;
-							reg1_read_o	<= 1'b1;
-							reg2_read_o	<= 1'b0;
-							instvalid	<= `InstValid;
-						end
 						`EXE_JALR: begin
 							wreg_o		<= `WriteEnable;
 							aluop_o		<= `EXE_LINK_OP;
@@ -628,33 +620,45 @@ module id(
 			if (op4 == `EXE_BLTZ || op4 == `EXE_BLTZAL) begin
 				if (reg1_data_i < 0) begin
 					branch_flag_o = `Branch;
-					branch_target_o <= pc_plus_4 + {14'b00000000000000, inst_i[15:0], 2'b00};
+					branch_target_o <= pc_plus_4 + {{14{inst_i[15]}}, inst_i[15:0], 2'b00};
+				end else begin
+					branch_flag_o <= `NotBranch;
 				end
 			end else if (op4 == `EXE_BGEZ || op4 == `EXE_BGEZAL) begin
 				if (reg1_data_i >= 0) begin
-					branch_flag_o = `Branch;
-					branch_target_o <= pc_plus_4 + {14'b00000000000000, inst_i[15:0], 2'b00};
+					branch_flag_o <= `Branch;
+					branch_target_o <= pc_plus_4 + {{14{inst_i[15]}}, inst_i[15:0], 2'b00};
+				end else begin
+					branch_flag_o <= `NotBranch;
 				end
 			end
 		end else if (op == `EXE_BEQ) begin
 			if (reg1_data_i == reg2_data_i) begin
-				branch_flag_o = `Branch;
-				branch_target_o <= pc_plus_4 + {14'b00000000000000, inst_i[15:0], 2'b00};
+				branch_flag_o <= `Branch;
+				branch_target_o <= pc_plus_4 + {{14{inst_i[15]}}, inst_i[15:0], 2'b00};
+			end else begin
+				branch_flag_o <= `NotBranch;
 			end
 		end else if (op == `EXE_BNE) begin
 			if (reg1_data_i != reg2_data_i) begin
-				branch_flag_o = `Branch;
-				branch_target_o <= pc_plus_4 + {14'b00000000000000, inst_i[15:0], 2'b00};
+				branch_flag_o <= `Branch;
+				branch_target_o <= pc_plus_4 + {{14{inst_i[15]}}, inst_i[15:0], 2'b00};
+			end else begin
+				branch_flag_o <= `NotBranch;
 			end
 		end else if (op == `EXE_BGTZ) begin
 			if (reg1_data_i > 0) begin
-				branch_flag_o = `Branch;
-				branch_target_o <= pc_plus_4 + {14'b00000000000000, inst_i[15:0], 2'b00};
+				branch_flag_o <= `Branch;
+				branch_target_o <= pc_plus_4 + {{14{inst_i[15]}}, inst_i[15:0], 2'b00};
+			end else begin
+				branch_flag_o <= `NotBranch;
 			end
 		end else if (op == `EXE_BLEZ) begin
 			if (reg1_data_i <= 0) begin
-				branch_flag_o = `Branch;
-				branch_target_o <= pc_plus_4 + {14'b00000000000000, inst_i[15:0], 2'b00};
+				branch_flag_o <= `Branch;
+				branch_target_o <= pc_plus_4 + {{14{inst_i[15]}}, inst_i[15:0], 2'b00};
+			end else begin
+				branch_flag_o <= `NotBranch;
 			end
 		end
 	end
